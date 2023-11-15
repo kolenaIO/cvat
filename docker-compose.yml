@@ -62,10 +62,16 @@ services:
     command: init run server
     labels:
       - traefik.enable=true
+      - traefik.http.middlewares.cvat-cors.headers.accesscontrolallowmethods=GET,OPTIONS,PUT
+      - traefik.http.middlewares.cvat-cors.headers.accesscontrolallowheaders=*
+      - traefik.http.middlewares.cvat-cors.headers.accesscontrolalloworiginlist=http://localhost:3000,https://trunk.kolena.io,https://app.kolena.io
+      - traefik.http.middlewares.cvat-cors.headers.accesscontrolmaxage=100
+      - traefik.http.middlewares.cvat-cors.headers.addvaryheader=true
       - traefik.http.services.cvat.loadbalancer.server.port=8080
       - traefik.http.routers.cvat.rule=Host(`${CVAT_HOST:-localhost}`) &&
         PathPrefix(`/api/`, `/static/`, `/admin`, `/documentation/`, `/django-rq`)
       - traefik.http.routers.cvat.entrypoints=web
+      - traefik.http.routers.cvat.middlewares=cvat-cors
     volumes:
       - cvat_data:/home/django/data
       - cvat_keys:/home/django/keys
